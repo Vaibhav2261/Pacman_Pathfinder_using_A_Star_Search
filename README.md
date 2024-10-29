@@ -18,6 +18,7 @@ Dequeue a node from the queue and visit it (e.g., print its value).
 For each unvisited neighbor of the dequeued node:
 Enqueue the neighbor into the queue.
 Mark the neighbor as visited.
+
 Termination: Repeat step 2 until the queue is empty.
 This algorithm ensures that all nodes in the graph are visited in a breadth-first manner, starting from the starting node.
 
