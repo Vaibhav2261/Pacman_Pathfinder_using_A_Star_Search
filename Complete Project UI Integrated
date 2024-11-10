@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacman Pathfinding Game</title>
+    <style>
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Main Game Container */
+        #game-container {
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            background-color: #333;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #grid-container {
+            display: grid;
+            gap: 2px;
+            margin-top: 20px;
+        }
+
+        /* Cell Styling */
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+
+        /* Cell Animations */
+        .cell:hover {
+            transform: scale(1.1);
+        }
+
+        .barrier {
+            background-color: #8B0000;
+        }
+
+        .path {
+            background-color: #FFD700;
+            animation: pathBlink 0.5s ease-in-out infinite alternate;
+        }
+
+        .pacman {
+            background-color: #ffcc00;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .goal {
+            background-color: #32CD32;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #32CD32;
+        }
+
+        /* Path Blink Animation */
+        @keyframes pathBlink {
+            from { background-color: #FFD700; }
+            to { background-color: #FFECB3; }
+        }
+
+        /* Button Styling */
+        .start, .clear-btn {
+            margin: 10px;
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .clear-btn {
+            background-color: #f44336;
+        }
+
+        .start:hover, .clear-btn:hover {
+            background-color: #666;
+        }
+
+        /* Input & Select Styling */
+        input, select {
+            font-size: 14px;
+            padding: 6px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: none;
+        }
+
+        /* Message Styling */
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Pacman Pathfinding Game</h1>
+        <div>
+            <label for="rows">Enter Grid Rows: </label><input type="number" id="rows" value="10">
+            <label for="cols">Enter Grid Columns: </label><input type="number" id="cols" value="10">
+            <br>
+            <label for="start-x">Enter Pacman's Start X: </label><input type="number" id="start-x" value="0">
+            <label for="start-y">Enter Pacman's Start Y: </label><input type="number" id="start-y" value="0">
+            <br>
+            <label for="goal-x">Enter Goal X: </label><input type="number" id="goal-x" value="9">
+            <label for="goal-y">Enter Goal Y: </label><input type="number" id="goal-y" value="9">
+            <br>
+            <label for="level-select">Select Game Level (1-5): </label>
+            <select id="level-select">
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
+                <option value="5">Level 5</option>
+            </select>
+            <br>
+            <button class="start" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="grid-container"></div>
+
+        <div class="message" id="message"></div>
+        <button class="clear-btn" onclick="clearGrid()">Clear Grid</button>
+    </div>
+
+    <script>
+        let grid = [];
+        let pacmanPos = { x: 0, y: 0 };
+        let goalPos = { x: 9, y: 9 };
+        let level = 1;
+
+        const gridContainer = document.getElementById("grid-container");
+        const messageDiv = document.getElementById("message");
+
+        function createGrid() {
+            gridContainer.innerHTML = '';
+            const rows = parseInt(document.getElementById("rows").value);
+            const cols = parseInt(document.getElementById("cols").value);
+
+            grid = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+            gridContainer.style.gridTemplateRows = repeat(${rows}, 30px);
+            gridContainer.style.gridTemplateColumns = repeat(${cols}, 30px);
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.dataset.x = i;
+                    cell.dataset.y = j;
+                    gridContainer.appendChild(cell);
+                }
+            }
+
+            document.querySelectorAll(".cell").forEach(cell => {
+                const x = parseInt(cell.dataset.x);
+                const y = parseInt(cell.dataset.y);
+
+                if (x === pacmanPos.x && y === pacmanPos.y) {
+                    cell.classList.add("pacman");
+                }
+                if (x === goalPos.x && y === goalPos.y) {
+                    cell.classList.add("goal");
+                }
+            });
+        }
+
+        function placeBarriers() {
+            const rows = parseInt(document.getElementById("rows").value);
+            const cols = parseInt(document.getElementById("cols").value);
+            const numBarriers = Math.floor(0.05 * rows * cols * level);
+
+            for (let i = 0; i < numBarriers; i++) {
+                const x = Math.floor(Math.random() * rows);
+                const y = Math.floor(Math.random() * cols);
+
+                if ((x !== pacmanPos.x || y !== pacmanPos.y) && (x !== goalPos.x || y !== goalPos.y)) {
+                    const cell = document.querySelector(.cell[data-x="${x}"][data-y="${y}"]);
+                    cell.classList.add("barrier");
+                    grid[x][y] = 1;
+                }
+            }
+        }
+
+        function startGame() {
+            pacmanPos.x = parseInt(document.getElementById("start-x").value);
+            pacmanPos.y = parseInt(document.getElementById("start-y").value);
+            goalPos.x = parseInt(document.getElementById("goal-x").value);
+            goalPos.y = parseInt(document.getElementById("goal-y").value);
+            level = parseInt(document.getElementById("level-select").value);
+
+            createGrid();
+            placeBarriers();
+            messageDiv.innerHTML = "Game Started! Try to find the path for Pacman.";
+            findPath();
+        }
+
+        function findPath() {
+            const rows = parseInt(document.getElementById("rows").value);
+            const cols = parseInt(document.getElementById("cols").value);
+
+            const directions = [
+                { x: -1, y: 0 },  // Up
+                { x: 1, y: 0 },   // Down
+                { x: 0, y: -1 },  // Left
+                { x: 0, y: 1 }    // Right
+            ];
+
+            const queue = [[pacmanPos.x, pacmanPos.y]];
+            const parent = Array.from({ length: rows }, () => Array(cols).fill(null));
+
+            grid[pacmanPos.x][pacmanPos.y] = 2;
+
+            while (queue.length > 0) {
+                const [x, y] = queue.shift();
+
+                if (x === goalPos.x && y === goalPos.y) {
+                    break;
+                }
+
+                for (let direction of directions) {
+                    const newX = x + direction.x;
+                    const newY = y + direction.y;
+
+                    if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] === 0) {
+                        grid[newX][newY] = 2;
+                        parent[newX][newY] = [x, y];
+                        queue.push([newX, newY]);
+                    }
+                }
+            }
+
+            let path = [];
+            let curr = [goalPos.x, goalPos.y];
+
+            while (curr) {
+                path.push(curr);
+                curr = parent[curr[0]][curr[1]];
+            }
+
+            if (path.length && path[path.length - 1][0] === pacmanPos.x && path[path.length - 1][1] === pacmanPos.y) {
+                path.reverse();
+                animatePath(path);
+                messageDiv.innerHTML = "Path found!";
+            } else {
+                messageDiv.innerHTML = "No path found!";
+            }
+        }
+
+        function animatePath(path) {
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index >= path.length) {
+                    clearInterval(interval);
+                    return;
+                }
+                const [x, y] = path[index++];
+                const cell = document.querySelector(.cell[data-x="${x}"][data-y="${y}"]);
+                cell.classList.add("path");
+            }, 150);
+        }
+
+        function clearGrid() {
+            gridContainer.innerHTML = "";
+            messageDiv.innerHTML = "";
+            createGrid();
+        }
+
+        createGrid();
+    </script>
+</body>
+</html>
