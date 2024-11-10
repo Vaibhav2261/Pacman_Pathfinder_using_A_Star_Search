@@ -1,28 +1,51 @@
 # Pacman-using-A-*
-About PACMAN Game:
-Pac-Man is an action maze chase video game; the player controls the eponymous character through an enclosed maze. The objective of the game is to eat all of the dots placed in the maze while avoiding four colored ghosts—Blinky (red), Pinky (pink), Inky (cyan), and Clyde (orange)—who pursue Pac-Man.
+Pacman Pathfinding Game
+This project is a simple console-based Pacman game, where the player controls Pacman to find the shortest path to a goal position on a grid. The grid contains barriers that Pacman must navigate around to reach the goal. The game uses the A (A-star) search algorithm* to compute the shortest path, considering walkable cells and barriers.
 
-Content for the project:
-1) Graphs:
-Graph Data Structure is a collection of nodes connected by edges. It's used to represent relationships between different entities. Graph algorithms are methods used to manipulate and analyze graphs, solving various problems like finding the shortest path or detecting cycles.
+Table of Contents
+1.Game Overview
+2.A* Search Algorithm
+3.Graph Theory Concepts
+4.Shortest Path Finding
+5.How to Play
+6.Sample Output 
 
-2) Breadth First Search or BFS for a Graph:
-Breadth First Search (BFS) is a fundamental graph traversal algorithm. It begins with a node, then first traverses all its adjacent. Once all adjacent are visited, then their adjacent are traversed. This is different from DFS in a way that closest vertices are visited before others. We mainly traverse vertices level by level. A lot of popular graph algorithms like Dijkstra’s shortest path, Kahn’s Algorithm, and Prim’s algorithm are based on BFS. BFS itself can be used to detect cycle in a directed and undirected graph, find shortest path in an unweighted graph and many more problems.
+1. Game Overview
+The Pacman game takes place on a grid where:
+Each cell can be either walkable, a barrier, or the start/goal.
+Barriers are randomly placed based on the selected difficulty level.
+The goal is to find the shortest path for Pacman to reach the target position using the A* search algorithm.
+The grid displays the path with '*' symbols, and Pacman's current position is shown as P.
 
-The algorithm starts from a given source and explores all reachable vertices from the given source. It is similar to the Breadth-First Traversal of a tree. Like tree, we begin with the given source (in tree, we begin with root) and traverse vertices level by level using a queue data structure. The only catch here is that, unlike trees, graphs may contain cycles, so we may come to the same node again. To avoid processing a node more than once, we use a boolean visited array.
+2. A* Search Algorithm
+The A search algorithm* is used to find the shortest path in the grid. It combines Dijkstra’s Algorithm (finding the shortest path with minimal cost) with a heuristic approach to guide the search, making it both efficient and effective for pathfinding tasks.
 
-Initialization: Enqueue the given source vertex into a queue and mark it as visited.
+Key Features of A* Algorithm:
+G Cost: The actual cost from the start node to the current node.
+H Cost: A heuristic estimate of the cost from the current node to the goal node. Here, the Manhattan distance is used as the heuristic.
+F Cost: The sum of G and H, which is used to prioritize nodes in the search.
+A* Process:
+A priority queue stores the nodes in the order of their F values, with lower F values having higher priority.
+The algorithm explores neighboring cells (up, down, left, right) to find the least-cost path to the goal.
+When the goal is reached, the algorithm reconstructs the path by backtracking through parent nodes.
 
-Exploration: While the queue is not empty:
-Dequeue a node from the queue and visit it (e.g., print its value).
-For each unvisited neighbor of the dequeued node:
-Enqueue the neighbor into the queue.
-Mark the neighbor as visited.
+3. Graph Theory Concepts
+In this project:
+Each cell on the grid is a node in a graph.
+Each walkable path between cells is an edge with a cost (1 in this case).
+The start and goal nodes are specific cells representing Pacman’s starting position and target.
+The grid is undirected, as each cell can potentially move in any direction to its neighbors.
 
-Termination: Repeat step 2 until the queue is empty.
-This algorithm ensures that all nodes in the graph are visited in a breadth-first manner, starting from the starting node.
+4. Shortest Path Finding
+Pathfinding is essential in games and robotics, as well as various AI applications. In this game:
+The A* algorithm determines the shortest route Pacman can take to reach the goal, avoiding barriers.
+The chosen heuristic (Manhattan distance) effectively estimates the distance in grid-based pathfinding problems.
 
-3)A* Search Algorithm:
-A* Search algorithm is one of the best and popular technique used in path-finding and graph traversals.
-A* Search algorithms, unlike other traversal techniques, it has “brains”. What it means is that it is really a smart algorithm which separates it from the other conventional algorithms. This fact is cleared in detail in below sections. 
-And it is also worth mentioning that many games and web-based maps use this algorithm to find the shortest path very efficiently.
+5. How to Play
+Initialize the Game: Enter the grid dimensions, start, and goal positions.
+Set Difficulty: Choose a difficulty level between 1 and 5. Higher levels increase the number of barriers.
+Find the Path: The game displays the initial grid. Press Enter to let Pacman move step-by-step along the computed path.
+Reach the Goal: The game marks each step Pacman takes and prints the message upon reaching the goal.
+
+6. Sample Output
+Upon execution, the game displays a grid with Pacman (P), barriers (#), walkable spaces (.), and the goal path (*). Pacman moves along the path step-by-step, with each step appearing in real time.
