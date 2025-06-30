@@ -1,4 +1,4 @@
-# Pacman-using-A-*
+# Pacman_Pathfinder_using_A_Star_Search
 Pacman Pathfinding Game
 This project is a simple console-based Pacman game, where the player controls Pacman to find the shortest path to a goal position on a grid. The grid contains barriers that Pacman must navigate around to reach the goal. The game uses the A (A-star) search algorithm* to compute the shortest path, considering walkable cells and barriers.
 
