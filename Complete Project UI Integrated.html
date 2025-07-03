@@ -164,8 +164,8 @@
 
             grid = Array.from({ length: rows }, () => Array(cols).fill(0));
 
-            gridContainer.style.gridTemplateRows = repeat(${rows}, 30px);
-            gridContainer.style.gridTemplateColumns = repeat(${cols}, 30px);
+            gridContainer.style.gridTemplateRows = `repeat(${rows}, 30px)`;
+            gridContainer.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
 
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
@@ -200,7 +200,7 @@
                 const y = Math.floor(Math.random() * cols);
 
                 if ((x !== pacmanPos.x || y !== pacmanPos.y) && (x !== goalPos.x || y !== goalPos.y)) {
-                    const cell = document.querySelector(.cell[data-x="${x}"][data-y="${y}"]);
+                    const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
                     cell.classList.add("barrier");
                     grid[x][y] = 1;
                 }
@@ -280,7 +280,7 @@
                     return;
                 }
                 const [x, y] = path[index++];
-                const cell = document.querySelector(.cell[data-x="${x}"][data-y="${y}"]);
+                const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
                 cell.classList.add("path");
             }, 150);
         }
